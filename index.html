@@ -557,27 +557,11 @@ va);I(IMG_SEARCH_ATTRIBUTION_MAP,Nb);I(IMG_GEN_REPLACE_MAP,K.g);L();Kc();d.g=0})
 </div>
 </div>
 
-<!-- Download Button (For Convenience) -->
-<button class="fixed bottom-6 right-6 z-50 bg-blue-600 hover:bg-blue-700 text-white p-4 rounded-full shadow-lg shadow-blue-600/30 transition-all hover:scale-110 group" onclick="downloadSource()" title="Download Code">
-<span class="material-symbols-outlined">download</span>
-<span class="absolute right-full mr-4 top-1/2 -translate-y-1/2 bg-slate-800 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity whitespace-nowrap pointer-events-none border border-slate-700">Download index.html</span>
-</button>
+
 
 <!-- Data & Logic -->
 <script>
-        function downloadSource() {
-            const htmlContent = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
-            const blob = new Blob([htmlContent], {type: "text/html"});
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "index.html";
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        }
-
+        
         const projects = {
             demographics: {
                 title: "Analysis of Demographic & Public Health Data",

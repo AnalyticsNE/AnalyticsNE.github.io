@@ -483,9 +483,63 @@ va);I(IMG_SEARCH_ATTRIBUTION_MAP,Nb);I(IMG_GEN_REPLACE_MAP,K.g);L();Kc();d.g=0})
 </div>
 </div>
 </div>
+
+ <div class="group relative bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden hover:border-blue-500/40 transition-all duration-300 cursor-pointer" onclick="openModal('used_cars')">
+    <div class="aspect-video w-full overflow-hidden relative">
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent z-10"></div>
+        <img alt="Car Analysis" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://images.unsplash.com/photo-1549317661-bd32c8ce0db2?q=80&w=800&auto=format&fit=crop">
+        <div class="absolute bottom-4 left-4 z-20">
+            <span class="px-2 py-1 bg-blue-600 text-white text-xs font-bold rounded uppercase tracking-wider">Python / Statsmodels</span>
+        </div>
+    </div>
+    <div class="p-6">
+        <h3 class="text-2xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">Used Car Price Prediction</h3>
+        <p class="text-slate-400 line-clamp-2 mb-4">Statistical analysis of pricing disparities between Chicago and Los Angeles using log-linear regression.</p>
+        <div class="flex items-center text-blue-400 text-sm font-medium">
+            View Analysis <span class="material-symbols-outlined text-sm ml-1 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+        </div>
+    </div>
+</div>
+
+<div class="group relative bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden hover:border-purple-500/40 transition-all duration-300 cursor-pointer" onclick="openModal('sentiment')">
+    <div class="aspect-video w-full overflow-hidden relative">
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent z-10"></div>
+        <img alt="AI Sentiment" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://images.unsplash.com/photo-1555949963-ff9fe0c870eb?q=80&w=800&auto=format&fit=crop">
+        <div class="absolute bottom-4 left-4 z-20">
+            <span class="px-2 py-1 bg-purple-600 text-white text-xs font-bold rounded uppercase tracking-wider">Deep Learning</span>
+        </div>
+    </div>
+    <div class="p-6">
+        <h3 class="text-2xl font-bold text-white mb-2 group-hover:text-purple-400 transition-colors">Sentiment Classification</h3>
+        <p class="text-slate-400 line-clamp-2 mb-4">Fine-tuned Transformer model achieving 0.9042 AUC in distinguishing positive vs. negative text sentiment.</p>
+        <div class="flex items-center text-purple-400 text-sm font-medium">
+            View Code <span class="material-symbols-outlined text-sm ml-1 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+        </div>
+    </div>
+</div>
+
+<div class="group relative bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden hover:border-teal-500/40 transition-all duration-300 cursor-pointer" onclick="openModal('wfh')">
+    <div class="aspect-video w-full overflow-hidden relative">
+        <div class="absolute inset-0 bg-gradient-to-t from-slate-900 to-transparent z-10"></div>
+        <img alt="WFH Data" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="https://images.unsplash.com/photo-1593642632823-8f7853670c6e?q=80&w=800&auto=format&fit=crop">
+        <div class="absolute bottom-4 left-4 z-20">
+            <span class="px-2 py-1 bg-teal-600 text-white text-xs font-bold rounded uppercase tracking-wider">Causal Inference</span>
+        </div>
+    </div>
+    <div class="p-6">
+        <h3 class="text-2xl font-bold text-white mb-2 group-hover:text-teal-400 transition-colors">WFH Impact Analysis</h3>
+        <p class="text-slate-400 line-clamp-2 mb-4">A/B testing and Difference-in-Differences analysis quantifying the effect of Work From Home on employee retention.</p>
+        <div class="flex items-center text-teal-400 text-sm font-medium">
+            View Methodology <span class="material-symbols-outlined text-sm ml-1 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+        </div>
+    </div>
+</div>
+ 
 </div>
 </div>
 </section>
+
+ 
 
 <!-- Contact Section -->
 <section class="py-20 bg-gradient-to-b from-slate-900 to-slate-950" id="contact">
@@ -731,7 +785,98 @@ print(final_model.summary())
 
 # Diagnostic Plots
 sns.residplot(x=final_model.fittedvalues, y=final_model.resid, lowess=True)`
+            },
+
+
+            used_cars: {
+                title: "Used Car Price Disparities: Chicago vs. LA",
+                filename: "Assignment_2_LövgrenOliver.ipynb",
+                tags: ["Python", "Statsmodels", "Log-Linear Regression"],
+                description: `
+                    This project analyzes the used car market in two major US cities to identify pricing disparities and value drivers.
+                    <br><br>
+                    <strong>Key Findings:</strong>
+                    <ul class="list-disc pl-5 space-y-2 mt-2">
+                        <li><strong>City Effect:</strong> Cars in Chicago are significantly cheaper than in Los Angeles, even after controlling for mileage and age.</li>
+                        <li><strong>Depreciation:</strong> Mileage has a non-linear negative effect on price; older cars hold value differently depending on the brand.</li>
+                        <li><strong>Model Performance:</strong> The log-linear regression model explained over 80% of the variance (R-squared > 0.8), proving that age and mileage are the dominant price predictors.</li>
+                    </ul>
+                `,
+                chartType: null,
+                code: `# Log-Linear Regression Model
+# Predicting log(price) using mileage, age, and city dummy variables
+model = smf.ols(
+    formula='np.log(price) ~ log_mileage + age + C(city) + C(make)', 
+    data=df_clean
+).fit()
+
+print(model.summary())
+
+# Calculating the "City Premium"
+# Coefficient for C(city)[T.LosAngeles] reveals the % price difference
+la_premium = np.exp(model.params['C(city)[T.LosAngeles]']) - 1
+print(f"LA Price Premium: {la_premium:.2%}")`
+            },
+
+            sentiment: {
+                title: "High-Precision Sentiment Classification",
+                filename: "Assignment_3_LövgrenOliver.ipynb",
+                tags: ["Python", "Deep Learning", "Transformers", "NLP"],
+                description: `
+                    A Deep Learning project utilizing Transformer architecture to classify text sentiment. The model achieved state-of-the-art performance metrics.
+                    <br><br>
+                    <strong>Results:</strong>
+                    <ul class="list-disc pl-5 space-y-2 mt-2">
+                        <li><strong>AUC Score:</strong> Achieved an Area Under Curve (AUC) of <strong>0.9042</strong>, indicating excellent separability between positive and negative sentiment classes.</li>
+                        <li><strong>Model Tuning:</strong> Fine-tuned hyperparameters to minimize validation loss and prevent overfitting.</li>
+                        <li><strong>Application:</strong> Capable of processing complex sentence structures where traditional "Bag of Words" models fail.</li>
+                    </ul>
+                `,
+                chartType: null,
+                code: `# Computing ROC and AUC
+from sklearn.metrics import roc_curve, auc
+
+fpr, tpr, thresholds = roc_curve(y_true, y_scores)
+roc_auc = auc(fpr, tpr)
+
+print("-" * 17)
+print(f"AUC score: {roc_auc:.4f}")
+print("-" * 17)
+
+# The result 0.9042 proves the model is far superior 
+# to random guessing (0.5) and acceptable baselines (0.7-0.8).`
+            },
+
+            wfh: {
+                title: "Causal Inference: The WFH Effect",
+                filename: "Assignment_4_LövgrenOliver.ipynb",
+                tags: ["Python", "Econometrics", "A/B Testing", "DiD"],
+                description: `
+                    An investigation into the causal impact of Work From Home (WFH) policies on employee quit rates and productivity.
+                    <br><br>
+                    <strong>Methodology & Insights:</strong>
+                    <ul class="list-disc pl-5 space-y-2 mt-2">
+                        <li><strong>Difference-in-Differences (DiD):</strong> Used interaction terms between "Treated" (WFH allowed) and "Post" (after policy change) variables.</li>
+                        <li><strong>Fixed Effects:</strong> Controlled for municipality and year fixed effects to absorb unobserved heterogeneity, raising R-squared from 0.04 to 0.905.</li>
+                        <li><strong>Impact:</strong> The analysis suggests a statistically significant <strong>11-14% reduction in quit rates</strong> for employees allowed to WFH.</li>
+                    </ul>
+                `,
+                chartType: null,
+                code: `# Fixed Effects Regression (Difference-in-Differences)
+# 'did_interaction' captures the true causal effect of the policy
+
+formula = "quit_rate ~ did_interaction + C(municipality) + C(year)"
+model_fe = smf.ols(formula=formula, data=df_wfh).fit()
+
+# Robust standard errors to account for serial correlation
+results = model_fe.get_robustcov_results(cov_type='HC1')
+
+print(results.summary())
+
+# The massive jump in R-squared (to 0.905) confirms that 
+# local factors (municipality) explain most of the baseline variation.`
             }
+         
         };
 
         let currentChart = null;

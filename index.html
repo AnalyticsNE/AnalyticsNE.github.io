@@ -415,6 +415,23 @@ va);I(IMG_SEARCH_ATTRIBUTION_MAP,Nb);I(IMG_GEN_REPLACE_MAP,K.g);L();Kc();d.g=0})
         </div>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Sandvik FX Project Card -->
+            <div class="group relative bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden hover:border-blue-500/40 transition-all duration-300 cursor-pointer" onclick="openModal('sandvik_fx')">
+                <div class="aspect-video w-full overflow-hidden relative bg-slate-950 flex items-center justify-center">
+                    <img alt="FX Analysis" class="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500" 
+                    src="https://quickchart.io/chart?c={type:'line',data:{labels:['Q1','Q2','Q3','Q4'],datasets:[{label:'Simulated VaR',data:[10.4,10.6,10.5,10.8],borderColor:'%233b82f6',fill:true,backgroundColor:'rgba(59,130,246,0.1)'}]},options:{legend:{display:false},scales:{yAxes:[{ticks:{fontColor:'white'},gridLines:{color:'rgba(255,255,255,0.1)'}}],xAxes:[{ticks:{fontColor:'white'},gridLines:{color:'rgba(255,255,255,0.1)'}}]}}}">
+                    <div class="absolute bottom-4 left-4 z-20">
+                        <span class="px-2 py-1 bg-blue-600 text-white text-xs font-bold rounded uppercase tracking-wider">R / Quant Finance</span>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-2xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">Sandvik FX Hedging & VaR</h3>
+                    <p class="text-slate-400 line-clamp-2 mb-4">Monte Carlo simulation, calculation of empirical VaR, and backtesting of various hedging strategies for USD and JPY.</p>
+                    <div class="flex items-center text-blue-400 text-sm font-medium">
+                        View Analysis <span class="material-symbols-outlined text-sm ml-1 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                    </div>
+                </div>
+            </div>
             
             <div class="group relative bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden hover:border-blue-500/40 transition-all duration-300 cursor-pointer" onclick="openModal('demographics')">
                 <div class="aspect-video w-full overflow-hidden relative bg-slate-950 flex items-center justify-center">
@@ -875,6 +892,197 @@ print(results.summary())
 
 # The massive jump in R-squared (to 0.905) confirms that 
 # local factors (municipality) explain most of the baseline variation.`
+            }
+         ,
+            sandvik_fx: {
+                title: "Sandvik FX Hedging & Risk Analysis",
+                filename: "Sandvik_Analysis.R",
+                tags: ["R", "Monte Carlo", "VaR", "Financial Modeling"],
+                description: `
+                    An in-depth analysis of currency risks for Sandvik, focusing on the exchange rate development between SEK/USD and SEK/JPY.
+                    <br><br>
+                    <strong>Key Components:</strong>
+                    <ul class="list-disc pl-5 space-y-2 mt-2">
+                        <li><strong>Value at Risk (VaR):</strong> Calculation of empirical and normal distribution VaR at 1% and 5% confidence levels.</li>
+                        <li><strong>Monte Carlo Simulation:</strong> Forecasting of future spot rates using Geometric Brownian Motion.</li>
+                        <li><strong>Hedging Strategies:</strong> Backtesting and comparison of Unhedged, Money Market, and Forward Market strategies.</li>
+                    </ul>
+                `,
+                chartType: 'line',
+                chartData: {
+                    labels: ['Q1', 'Q2', 'Q3', 'Q4'],
+                    datasets: [{
+                        label: 'Simulated VaR',
+                        data: [10.4, 10.6, 10.5, 10.8],
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                code: `dir_path<-"C:/Users/ol222pb/OneDrive - Linnéuniversitetet/Desktop/Sandvik"
+setwd(dir_path)
+getwd()
+packages<-c("mvtnorm","timeSeries")
+#for (. in packages){install.packages(.)}
+for (. in packages){library(.,character.only = T)}
+################################################################################
+# Let's define some functions that we use later on:
+VaR_normal<-function(x,p){
+  mu=mean(x)
+  std=sd(x)
+  VaR=mu+std*qnorm(p)
+  return(VaR)
+}
+Monte_Carlo_Simulation<-function(St,rd,rf,sigma,dt,ns,seed){
+  set.seed(seed)
+  epsilon=rnorm(ns)
+  output=St*exp((rd-rf-0.5*sigma^2)*dt+sigma*sqrt(dt)*epsilon)
+  return(output)
+}
+
+
+################################################################################
+######################## Importing the data ####################################
+################################################################################
+Data<-read.csv2("Data.csv",sep=";",header=T,check.names=F)
+Data<-na.omit(Data)
+dim(Data)
+head(Data)
+SEK.USD<-as.matrix(Data[,2])
+SEK.JPY<-as.matrix(Data[,3])
+rownames(SEK.USD)<-rownames(SEK.JPY)<-Data[,1]
+SEK.USD<-timeSeries(SEK.USD)
+SEK.JPY<-timeSeries(SEK.JPY)
+S_SEK.USD<-Data[1,2]
+S_SEK.JPY<-Data[1,3]
+F_SEK.USD<-Data[1,4]
+F_SEK.JPY<-Data[1,8]
+i_SEK<-4
+i_USD<-Data[1,5]
+i_JPY<-Data[1,6]
+K_SEK.USD<-S_SEK.USD
+K_SEK.JPY<-S_SEK.JPY
+ST_SEK.USD<-Data[262,2]
+ST_SEK.JPY<-Data[262,3]
+receivable_JPY<-11169920000
+receivable_USD<-1717890000
+################################################################################
+## Task 1: The development of the daily spot rates & Empirical VaR #############
+################################################################################
+# First, we plot the spot rates:
+plot(SEK.USD,type="l",col="cyan",xlab = "Date",ylab="S(SEK/$)",
+     lwd=2
+     ,main="USD to SEK trajectory during 2024")
+
+plot(SEK.JPY,type="l",col="blue",xlab = "Date",ylab="S(SEK/¥)",
+     lwd=2
+     ,main="JPY to SEK trajectory during 2024")
+
+hist(SEK.USD, breaks = 30,col = "lightblue", border = "green",main="Histogram of S($/SEK)")
+abline(v = c(quantile(as.numeric(SEK.USD),0.01), quantile(as.numeric(SEK.USD),0.05), quantile(as.numeric(SEK.USD),0.1)),
+       col = c('red', 'blue', 'green'), lwd = 2, lty = 'dashed')
+legend(x = "topright", lty = 'dashed', lwd = 2,  
+       col= c('red', 'blue', 'green'),  
+       legend=c("1%-VaR", "5%-VaR","10%-VaR"))
+hist(SEK.JPY, breaks = 30,col = "khaki3", border = "green",main="Histogram of S(¥/SEK)")
+abline(v = c(quantile(as.numeric(SEK.JPY),0.01), quantile(as.numeric(SEK.JPY),0.05), quantile(as.numeric(SEK.JPY),0.1)),
+       col = c('red', 'blue', 'green'), lwd = 2, lty = 'dashed')
+legend(x = "topright", lty = 'dashed', lwd = 2,  
+       col= c('red', 'blue', 'green'),  
+       legend=c("1%-VaR", "5%-VaR","10%-VaR"))
+# Then, we can calculate some descriptive statistics including VaR:
+descriptive_statistics<-matrix(NA,nrow=8,nc=2)
+descriptive_statistics[1,]<-c(mean(SEK.USD),mean(SEK.JPY))
+descriptive_statistics[2,]<-c(sd(SEK.USD),sd(SEK.JPY))
+descriptive_statistics[3,]<-c(skewness(SEK.USD),skewness(SEK.JPY))
+descriptive_statistics[4,]<-c(kurtosis(SEK.USD),kurtosis(SEK.JPY))
+descriptive_statistics[5,]<-c(quantile(as.numeric(SEK.USD),0.01),quantile(as.numeric(SEK.JPY),0.01))
+descriptive_statistics[6,]<-c(quantile(as.numeric(SEK.USD),0.05),quantile(as.numeric(SEK.JPY),0.05))
+descriptive_statistics[7,]<-c(VaR_normal(as.numeric(SEK.USD),0.01),VaR_normal(as.numeric(SEK.JPY),0.01))
+descriptive_statistics[8,]<-c(VaR_normal(as.numeric(SEK.USD),0.05),VaR_normal(as.numeric(SEK.JPY),0.05))
+colnames(descriptive_statistics)<-c("S($/SEK)","S(¥/SEK)")
+rownames(descriptive_statistics)<-c("Mean","Volatility","Skewness","Kurtosis",
+                                    "1% VaR (empirical)","5% VaR (empirical)","1% VaR (normal)","5% VaR (normal)")
+round(descriptive_statistics,4)
+write.csv(round(descriptive_statistics,4),file="descriptive_statistics_SEK.csv")
+################################################################################
+###### Task 2: Forecasting Spot Rates based on Monte-Carlo Simulation ##########
+################################################################################
+simulated_SEK.USD<-Monte_Carlo_Simulation(St=S_SEK.USD,rd=i_USD/100,rf=i_SEK/100,
+                                          sigma=sd(na.omit(diff(log(SEK.USD))))*sqrt(365),dt=1,ns=1000,seed=1000)
+simulated_SEK.JPY<-Monte_Carlo_Simulation(St=S_SEK.JPY,rd=i_USD/100,rf=i_JPY/100,
+                                          sigma=sd(na.omit(diff(log(SEK.JPY))))*sqrt(365),dt=1,ns=1000,seed=1000)
+
+hist(simulated_SEK.USD, breaks = 30,col = "lightblue", border = "green",main="Histogram of Simulated S($/SEK)")
+hist(simulated_SEK.JPY, breaks = 30,col = "khaki3", border = "green",main="Histogram of Simulated S(¥/SEK)")
+
+desc_stat_simulated_rates<-matrix(NA,nrow=8,nc=2)
+desc_stat_simulated_rates[1,]<-c(mean(simulated_SEK.USD),mean(simulated_SEK.JPY))
+desc_stat_simulated_rates[2,]<-c(sd(simulated_SEK.USD),sd(simulated_SEK.JPY))
+desc_stat_simulated_rates[3,]<-c(skewness(simulated_SEK.USD),skewness(simulated_SEK.JPY))
+desc_stat_simulated_rates[4,]<-c(kurtosis(simulated_SEK.USD),kurtosis(simulated_SEK.JPY))
+desc_stat_simulated_rates[5,]<-c(quantile(simulated_SEK.USD,0.01),quantile(simulated_SEK.JPY,0.01))
+desc_stat_simulated_rates[6,]<-c(quantile(simulated_SEK.USD,0.05),quantile(simulated_SEK.JPY,0.05))
+desc_stat_simulated_rates[7,]<-c(VaR_normal(simulated_SEK.USD,0.01),VaR_normal(simulated_SEK.JPY,0.01))
+desc_stat_simulated_rates[8,]<-c(VaR_normal(simulated_SEK.USD,0.05),VaR_normal(simulated_SEK.JPY,0.05))
+colnames(desc_stat_simulated_rates)<-c("Simulated S($/SEK)","Simulated S(¥/SEK)")
+rownames(desc_stat_simulated_rates)<-c("Forecast","Volatility","Skewness","Kurtosis",
+                                       "1% VaR (empirical)","5% VaR (empirical)","1% VaR (normal)","5% VaR (normal)")
+round(desc_stat_simulated_rates,4)
+write.csv(round(desc_stat_simulated_rates,4),file="desc_stat_simulated_rates_SEK.csv")
+
+
+# Simulated unhedged receivables in USD and JPY
+simulated_unhedged_receivable_USD <- simulated_SEK.USD * receivable_USD
+simulated_unhedged_receivable_JPY <- simulated_SEK.JPY * receivable_JPY
+
+# Plot histogram for unhedged USD receivable
+hist(simulated_unhedged_receivable_USD, breaks = 30, col = "darkcyan", xlab="", border = "gray", main="Histogram of Simulated Unhedged Receivable (USD)")
+abline(v = c(quantile(simulated_unhedged_receivable_USD, 0.01), quantile(simulated_unhedged_receivable_USD, 0.05), quantile(simulated_unhedged_receivable_USD, 0.1)),
+       col = c('red', 'blue', 'green'), lwd = 2, lty = 'dashed')
+legend("topright", lty = 'dashed', lwd = 2, col= c('red', 'blue', 'green'), legend=c("1%-VaR", "5%-VaR","10%-VaR"))
+
+# Plot histogram for unhedged JPY receivable
+hist(simulated_unhedged_receivable_JPY, breaks = 30, col = "purple", xlab="", border = "gray", main="Histogram of Simulated Unhedged Receivable (JPY)")
+abline(v = c(quantile(simulated_unhedged_receivable_JPY, 0.01), quantile(simulated_unhedged_receivable_JPY, 0.05), quantile(simulated_unhedged_receivable_JPY, 0.1)),
+       col = c('red', 'blue', 'green'), lwd = 2, lty = 'dashed')
+legend("topright", lty = 'dashed', lwd = 2, col= c('red', 'blue', 'green'), legend=c("1%-VaR", "5%-VaR","10%-VaR"))
+
+################################################################################
+############## Task 3: Backtesting Different Hedging Strategies ################
+################################################################################
+########################## Receivables in USD & JPY ############################
+################################################################################
+
+# Unhedged Receivables
+unhedged_receivable_USD <- ST_SEK.USD * receivable_USD
+unhedged_receivable_JPY <- ST_SEK.JPY * receivable_JPY
+
+# Money Market Hedge (USD and JPY)
+money_market_hedging_receivable_USD <- (receivable_USD / (1 + i_USD/100)) * S_SEK.USD * (1 + i_SEK/100)
+money_market_hedging_receivable_JPY <- (receivable_JPY / (1 + i_JPY/100)) * S_SEK.JPY * (1 + i_SEK/100)
+
+# Forward Hedge (USD and JPY)
+forward_hedging_receivable_USD <- receivable_USD * F_SEK.USD
+forward_hedging_receivable_JPY <- receivable_JPY * F_SEK.JPY
+
+# Option Market Hedge (if applicable)
+option_market_hedging_receivable_USD <- NA  # Replace with actual formula if used
+option_market_hedging_receivable_JPY <- NA  # Replace with actual formula if used
+
+# Summary Table
+summary_table <- matrix(NA, 4, 2)
+summary_table[1,] <- c(unhedged_receivable_USD, unhedged_receivable_JPY)
+summary_table[2,] <- c(money_market_hedging_receivable_USD, money_market_hedging_receivable_JPY)
+summary_table[3,] <- c(forward_hedging_receivable_USD, forward_hedging_receivable_JPY)
+summary_table[4,] <- c(option_market_hedging_receivable_USD, option_market_hedging_receivable_JPY)
+
+rownames(summary_table) <- c("Unhedged Position", "Money Market", "Forward Market", "Option Market")
+colnames(summary_table) <- c("USD Receivable", "JPY Receivable")
+
+# Save the summary table as CSV
+write.csv(round(summary_table, 0), file = "summary_table_SEK5.csv")`
             }
          
         };

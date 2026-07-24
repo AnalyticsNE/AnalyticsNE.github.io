@@ -432,6 +432,23 @@ va);I(IMG_SEARCH_ATTRIBUTION_MAP,Nb);I(IMG_GEN_REPLACE_MAP,K.g);L();Kc();d.g=0})
                     </div>
                 </div>
             </div>
+         <!-- PGA Tour Analysis Project Card -->
+            <div class="group relative bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden hover:border-green-500/40 transition-all duration-300 cursor-pointer" onclick="openModal('pga_golf')">
+                <div class="aspect-video w-full overflow-hidden relative bg-slate-950 flex items-center justify-center">
+                    <img alt="PGA Analysis Plot" class="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500" 
+                    src="https://quickchart.io/chart?c={type:'bar',data:{labels:['Regular','Signature','Major'],datasets:[{label:'Avg%20Score%20Impact',data:[0,1.2,2.8],backgroundColor:['%23334155','%238b5cf6','%2310b981']}]},options:{legend:{display:false},scales:{yAxes:[{ticks:{fontColor:'white'},gridLines:{color:'rgba(255,255,255,0.1)'}}],xAxes:[{ticks:{fontColor:'white'},gridLines:{display:false}}]}}}">
+                    <div class="absolute bottom-4 left-4 z-20">
+                        <span class="px-2 py-1 bg-green-600 text-white text-xs font-bold rounded uppercase tracking-wider">R / Econometrics</span>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-2xl font-bold text-white mb-2 group-hover:text-green-400 transition-colors">PGA Tour Performance Analysis</h3>
+                    <p class="text-slate-400 line-clamp-2 mb-4">Econometric evaluation of professional golfer performance across different tournament environments using Fixed Effects regressions.</p>
+                    <div class="flex items-center text-green-400 text-sm font-medium">
+                        View Methodology <span class="material-symbols-outlined text-sm ml-1 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                    </div>
+                </div>
+            </div>
             
             <div class="group relative bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden hover:border-blue-500/40 transition-all duration-300 cursor-pointer" onclick="openModal('demographics')">
                 <div class="aspect-video w-full overflow-hidden relative bg-slate-950 flex items-center justify-center">
@@ -1083,6 +1100,47 @@ colnames(summary_table) <- c("USD Receivable", "JPY Receivable")
 
 # Save the summary table as CSV
 write.csv(round(summary_table, 0), file = "summary_table_SEK5.csv")`
+            },
+            
+            pga_golf: {
+                title: "PGA Tour Performance & Fixed Effects",
+                filename: "pga_analysis_2018_2025.R",
+                tags: ["R", "Econometrics", "Fixed Effects", "ggplot2", "Data Cleaning"],
+                description: `
+                    An econometric analysis investigating how different tournament environments (Regular, Signature, Majors) impact professional golfer performance on the PGA Tour (2018-2025).
+                    <br><br>
+                    <strong>Methodology & Insights:</strong>
+                    <ul class="list-disc pl-5 space-y-2 mt-2">
+                        <li><strong>Fixed Effects Modeling:</strong> Utilized the <code>fixest</code> package to control for player ability (Player FE) and course difficulty (Course FE) to isolate the true effect of tournament types.</li>
+                        <li><strong>Data Engineering:</strong> Cleaned and categorized historical PGA data, computing custom 'Strokes Gained' metrics relative to field averages.</li>
+                        <li><strong>Robustness Checks:</strong> Validated findings against pre-cut 36-hole scores to eliminate survivorship bias, and evaluated round-level effects.</li>
+                        <li><strong>Player Stratification:</strong> Built heatmaps analyzing performance variations across different player skill tiers (Elite, Average, Lower Tier).</li>
+                    </ul>
+                `,
+                chartType: null,
+                code: `# Main FE model (average over all years 2018-2025)
+# Clustering automatic std errors on player names
+model_absolute_main <- feols(total ~ i(Tournament_Type) | name + location,
+                             data = df_clean, cluster = ~name)
+
+# Robustness check: SG on Round 1 & 2 (solving selection bias from the cut)
+model_robust_cut <- feols(SG_36 ~ i(Tournament_Type) | name, 
+                          data = df_robust)
+
+# Creating Professional Output Tables
+modelsummary(
+  list(
+    "Pooled OLS" = feols(total ~ i(Tournament_Type), data = df_clean),
+    "Main FE"    = model_absolute_main,
+    "Main FE + Year" = model_year_fe
+  ),
+  stars = c('*' = .1, '**' = 0.05, '***' = .01),
+  title = "Impact of Tournament Incentives on Player Performance",
+  notes = list(
+    "Standard errors clustered at player level.",
+    "Course fixed effects control for variation in course difficulty."
+  )
+)`
             }
          
         };

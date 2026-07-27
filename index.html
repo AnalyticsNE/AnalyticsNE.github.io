@@ -432,6 +432,23 @@ va);I(IMG_SEARCH_ATTRIBUTION_MAP,Nb);I(IMG_GEN_REPLACE_MAP,K.g);L();Kc();d.g=0})
                     </div>
                 </div>
             </div>
+         <!-- Quantitative Portfolio Optimizer Card -->
+            <div class="group relative bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden hover:border-blue-500/40 transition-all duration-300 cursor-pointer" onclick="openModal('portfolio_opt')">
+                <div class="aspect-video w-full overflow-hidden relative bg-slate-950 flex items-center justify-center">
+                    <img alt="Efficient Frontier Plot" class="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500" 
+                    src="https://quickchart.io/chart?c={type:'line',data:{labels:['10%25','15%25','20%25','25%25','30%25'],datasets:[{label:'Efficient%20Frontier',data:[5,12,18,22,24],borderColor:'%233b82f6',fill:false,tension:0.4},{label:'Optimal%20Portfolio',data:[null,null,18,null,null],pointBackgroundColor:'%23ef4444',pointStyle:'star',pointRadius:10}]}}">
+                    <div class="absolute bottom-4 left-4 z-20">
+                        <span class="px-2 py-1 bg-blue-600 text-white text-xs font-bold rounded uppercase tracking-wider">Python / Finance</span>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-2xl font-bold text-white mb-2 group-hover:text-blue-400 transition-colors">Quantitative Portfolio Optimizer</h3>
+                    <p class="text-slate-400 line-clamp-2 mb-4">Algorithmic implementation of Modern Portfolio Theory (MPT) using Python to maximize Sharpe Ratio and provide robo-advisor alternatives.</p>
+                    <div class="flex items-center text-blue-400 text-sm font-medium">
+                        View Methodology <span class="material-symbols-outlined text-sm ml-1 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                    </div>
+                </div>
+            </div>
          <!-- PGA Tour Analysis Project Card -->
             <div class="group relative bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden hover:border-green-500/40 transition-all duration-300 cursor-pointer" onclick="openModal('pga_golf')">
                 <div class="aspect-video w-full overflow-hidden relative bg-slate-950 flex items-center justify-center">
@@ -651,6 +668,55 @@ va);I(IMG_SEARCH_ATTRIBUTION_MAP,Nb);I(IMG_GEN_REPLACE_MAP,K.g);L();Kc();d.g=0})
 <script>
         
         const projects = {
+         portfolio_opt: {
+                title: "Quantitative Portfolio Optimization (MPT)",
+                filename: "portfolio_optimizer.py",
+                tags: ["Python", "SciPy", "yfinance", "Financial Modeling"],
+                description: `
+                    A quantitative finance tool applying Harry Markowitz's Modern Portfolio Theory (MPT) to historical market data to construct an optimized investment portfolio.
+                    <br><br>
+                    <strong>Methodology & Results:</strong>
+                    <ul class="list-disc pl-5 space-y-2 mt-2">
+                        <li><strong>Algorithmic Optimization:</strong> Deployed <code>scipy.optimize</code> (SLSQP method) to identify the Tangency Portfolio on the Efficient Frontier, achieving a simulated <strong>Sharpe Ratio of 1.55</strong>.</li>
+                        <li><strong>Asset Allocation:</strong> Concentrated capital into specific high-growth (TSLA, NVDA) and defensive (INVE-B.ST, AXFO.ST) assets to maximize risk-adjusted returns (Expected Return: 54.2%, Risk: 33.6%).</li>
+                        <li><strong>Diagnostic Screening:</strong> Programmatically evaluated excluded assets (0% allocation), identifying high covariance (domination by other assets) and poor individual risk-adjusted performance as the primary factors for exclusion.</li>
+                        <li><strong>Robo-Advisor Integration:</strong> Built an automated screener that scans a universe of alternative equities to recommend replacements (e.g., Novo Nordisk, Evolution) based on superior historical Sharpe ratios.</li>
+                    </ul>
+                `,
+                chartType: null,
+                code: `# Output from SciPy Optimization (SLSQP) & Robo-Advisor
+----------------------------------------
+OPTIMAL PORTFOLIO ALLOCATION (Max Sharpe)
+----------------------------------------
+INVE-B.ST: 13.26%
+AXFO.ST: 12.21%
+VOLV-B.ST: 0.00%
+HOLM-B.ST: 0.00%
+AZA.ST: 0.00%
+NVDA: 11.05%
+TSLA: 41.36%
+GOOGL: 0.00%
+SINCH.ST: 0.00%
+SBB-B.ST: 16.14%
+EZU: 5.98%
+----------------------------------------
+Expected Annual Return: 54.22%
+Annual Volatility (Risk): 33.60%
+Sharpe Ratio: 1.55
+
+========================================
+ROBO-ADVISOR: TOP 3 RECOMMENDATIONS TO REPLACE DROPPED ASSETS:
+----------------------------------------
+1. NVO (Novo Nordisk)
+   * Sharpe Ratio: 0.85
+   * Annual Return: 28.81%
+   * Annual Volatility: 31.49%
+
+2. EVO.ST (Evolution)
+   * Sharpe Ratio: 0.67
+   * Annual Return: 32.97%
+   * Annual Volatility: 46.04%`
+            },
             demographics: {
                 title: "Analysis of Demographic & Public Health Data",
                 filename: "Lövgren_assignment_1.Rmd",

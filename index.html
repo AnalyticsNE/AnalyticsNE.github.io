@@ -449,6 +449,23 @@ va);I(IMG_SEARCH_ATTRIBUTION_MAP,Nb);I(IMG_GEN_REPLACE_MAP,K.g);L();Kc();d.g=0})
                     </div>
                 </div>
             </div>
+         <!-- Swing Trading Project Card -->
+            <div class="group relative bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden hover:border-amber-500/40 transition-all duration-300 cursor-pointer" onclick="openModal('swing_trading')">
+                <div class="aspect-video w-full overflow-hidden relative bg-slate-950 flex items-center justify-center">
+                    <img alt="Trading Algorithm" class="w-full h-full object-contain p-4 group-hover:scale-105 transition-transform duration-500" 
+                    src="https://quickchart.io/chart?c={type:'line',data:{labels:['Dag 1','Dag 5','Dag 10','Dag 15','Dag 20'],datasets:[{label:'Aktiepris',data:[100,105,102,110,118],borderColor:'%23f59e0b',fill:false,tension:0.1},{label:'EMA-20 (Trend)',data:[98,100,103,106,110],borderColor:'%2364748b',borderDash:[5,5],fill:false,pointRadius:0}]},options:{legend:{display:false},scales:{yAxes:[{ticks:{fontColor:'white'},gridLines:{color:'rgba(255,255,255,0.1)'}}],xAxes:[{ticks:{fontColor:'white'},gridLines:{color:'rgba(255,255,255,0.1)'}}]}}}">
+                    <div class="absolute bottom-4 left-4 z-20">
+                        <span class="px-2 py-1 bg-amber-600 text-white text-xs font-bold rounded uppercase tracking-wider">Python / Algo Trading</span>
+                    </div>
+                </div>
+                <div class="p-6">
+                    <h3 class="text-2xl font-bold text-white mb-2 group-hover:text-amber-400 transition-colors">Algorithmic Swing Trading Model</h3>
+                    <p class="text-slate-400 line-clamp-2 mb-4">Kvantitativ aktiescanner som tillämpar market regime-filter, momentum-breakouts och dynamisk riskhantering via ATR.</p>
+                    <div class="flex items-center text-amber-400 text-sm font-medium">
+                        View Methodology <span class="material-symbols-outlined text-sm ml-1 group-hover:translate-x-1 transition-transform">arrow_forward</span>
+                    </div>
+                </div>
+            </div>
          <!-- PGA Tour Analysis Project Card -->
             <div class="group relative bg-slate-900 rounded-2xl border border-slate-800 overflow-hidden hover:border-green-500/40 transition-all duration-300 cursor-pointer" onclick="openModal('pga_golf')">
                 <div class="aspect-video w-full overflow-hidden relative bg-slate-950 flex items-center justify-center">
@@ -668,6 +685,44 @@ va);I(IMG_SEARCH_ATTRIBUTION_MAP,Nb);I(IMG_GEN_REPLACE_MAP,K.g);L();Kc();d.g=0})
 <script>
         
         const projects = {
+         swing_trading: {
+                title: "Quantitative Swing Trading Model (Sverige)",
+                filename: "institutional_swing_model.py",
+                tags: ["Python", "yfinance", "Multithreading", "Risk Management"],
+                description: `
+                    Ett kvantitativt och regelbaserat swing trading-system byggt i Python. Skriptet analyserar automatiskt den svenska aktiemarknaden (OMXS30 och Large/Mid Cap) för att identifiera asymmetriska köplägen.
+                    <br><br>
+                    <strong>Metodik & Funktionalitet:</strong>
+                    <ul class="list-disc pl-5 space-y-2 mt-2">
+                        <li><strong>Market Regime Filter:</strong> Analyserar OMXS30 mot dess 200-dagars medelvärde. Halverar automatiskt systemrisken i björnmarknader (Bear Market).</li>
+                        <li><strong>Kvantitativ Scanner:</strong> Parallelliserad nedladdning via <code>ThreadPoolExecutor</code> scannar aktier för momentum-breakouts (nära 20-dagars högsta) kombinerat med MACD-crossovers och volymspikar.</li>
+                        <li><strong>Händelsefiltrering:</strong> Filtrerar automatiskt bort bolag med kvartalsrapporter inom 14 dagar för att undvika oönskad händelserisk.</li>
+                        <li><strong>Dynamisk Riskhantering:</strong> Beräknar volatilitet via Average True Range (ATR) för att matematiskt fastställa Stop-Loss, Take-Profit och exakt positionsstorlek baserat på en fördefinierad portföljrisk (ex. 1%).</li>
+                    </ul>
+                `,
+                chartType: null,
+                code: `# Kärnlogik: Uträkning av ATR och Riskhantering
+hist['High-Low'] = hist['High'] - hist['Low']
+hist['High-Close'] = np.abs(hist['High'] - hist['Close'].shift())
+hist['Low-Close'] = np.abs(hist['Low'] - hist['Close'].shift())
+tr = hist[['High-Low', 'High-Close', 'Low-Close']].max(axis=1)
+atr_14 = tr.rolling(14).mean().iloc[-1]
+atr_pct = (atr_14 / current_price) * 100
+
+# Striktare köpvillkor (Trend, Breakout, Volym & Momentum)
+is_buy = (current_price > ema_20_daily) and is_breakout and \\
+         (rsi_14 < 70) and (macd_cross_up or (macd_positive and volume_surge))
+
+# Riskkalkylator med dynamisk Trailing Target
+stop_loss = round(current_price - (atr_14 * 2), 2)
+target = round(current_price + (atr_14 * 4), 2)
+breakeven_trigger = round(current_price + (atr_14 * 2), 2) 
+
+# Beräkna exakt positionsstorlek baserat på portföljrisk
+risk_amount = PORTFOLIO_VALUE * (current_risk / 100)
+risk_per_share = current_price - stop_loss
+shares_to_buy = int(risk_amount // risk_per_share)`
+            },
          portfolio_opt: {
                 title: "Quantitative Portfolio Optimization (MPT)",
                 filename: "portfolio_optimizer.py",
